@@ -1,27 +1,45 @@
-let player1Score = 0;
-let player2Score = 0;
 let rounds = parseInt(document.querySelector("#rounds").value);
-let scoreDisplayP1 = document.querySelector("#scoreP1");
-let scoreDisplayP2 = document.querySelector("#scoreP2");
-let plusP1 = document.querySelector("#plusP1");
-let plusP2 = document.querySelector("#plusP2");
+
+let player1 = {
+    score: 0,
+    display: document.querySelector("#scoreP1"),
+    plus: document.querySelector("#plusP1")
+}
+
+let player2 = {
+    score: 0,
+    display: document.querySelector("#scoreP2"),
+    plus: document.querySelector("#plusP2")
+}
+
+let players = [player1, player2];
+
+function incrementScore(playerIdx) {
+    players[playerIdx].score++;
+    players[playerIdx].display.innerText=players[playerIdx].score;
+    if(players[playerIdx].score == rounds) {
+        players[playerIdx].display.classList.toggle("text-success")
+        players[1 - playerIdx].display.classList.toggle("text-danger")
+        toggleButtons(1);
+    }
+}
 
 // Reset game state
 function reset() {
-    player1Score = 0;
-    player2Score = 0;
+    for(let p of players){
+        p.score = 0;
+        p.display.innerText=p.score;
+        p.display.classList.remove("text-success", "text-danger");
+    }
     rounds = parseInt(document.querySelector("#rounds").value);
-    scoreDisplayP1.innerText=player1Score;
-    scoreDisplayP2.innerText=player2Score;
-    toggleButtons();
-    scoreDisplayP1.classList = "";
-    scoreDisplayP2.classList = "";
+    toggleButtons(0);
 }
 
 // Toggle enabled/disabled of buttons
-toggleButtons = () => {
-    plusP1.disabled = !plusP1.disabled;
-    plusP2.disabled = !plusP2.disabled;
+toggleButtons = (disabled) => {
+    for(let p of players){
+        p.plus.disabled = disabled;
+    }
 }
 
 // Bind changing of rounds selector to reset function
@@ -30,24 +48,8 @@ document.querySelector("#rounds").addEventListener("input", () => {
 });
 
 // Player score events
-plusP1.addEventListener("click", () => {
-    player1Score++;
-    scoreDisplayP1.innerText=player1Score;
-    if(player1Score == rounds) {
-        scoreDisplayP1.classList.toggle("text-success");
-        scoreDisplayP2.classList.toggle("text-danger");
-        toggleButtons();
-    }
-});
-plusP2.addEventListener("click", () => {
-    player2Score++;
-    scoreDisplayP2.innerText=player2Score;
-    if(player2Score == rounds) {
-        scoreDisplayP2.classList.toggle("text-success");
-        scoreDisplayP1.classList.toggle("text-danger");
-        toggleButtons();
-    }
-});
+players[0].plus.addEventListener("click", () => {incrementScore(0)});
+players[1].plus.addEventListener("click", () => {incrementScore(1)});
 
 // Reset binding
 document.querySelector("#reset").addEventListener("click", reset);
